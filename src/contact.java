@@ -24,4 +24,8 @@ public class contact {
         return this.phoneNumber;
     }
 
+    public String allInfo(){
+        return this.name + "-" + this.phoneNumber;
+    }
+
 }
