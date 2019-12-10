@@ -90,6 +90,21 @@ public class contactApp {
         return false;
     }
 
+    public static boolean checkPhone(String phone){
+        try{
+            for(String line : Files.readAllLines(filepath)){
+                String[] eachLine = line.split("-");
+                if(eachLine[1].equalsIgnoreCase(phone)){
+                    return true;
+                }
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
 
     public static void addName(){
         System.out.println("Please enter the name:");
@@ -102,8 +117,15 @@ public class contactApp {
             if(response.equalsIgnoreCase("n") || response.equalsIgnoreCase("no")){
                 addName();
             }
+
         }
         String phone = inputPhone();
+        boolean matchPhone = checkPhone(phone);
+        if(matchPhone){
+            System.out.println("Same phone number on file.");
+            phone = inputPhone();
+        }
+
         contact user = new contact(name, phone);
         try{
             Files.write(Paths.get("data", "contacts.txt"), Arrays.asList(user.allInfo()), StandardOpenOption.APPEND);
@@ -112,13 +134,80 @@ public class contactApp {
         }
 
     }
-//    public static String inputName () {
-//        for(String line : Files.readAllLines(filepath)){
-//            String[] eachLine = line.split("-");
-//            if(eachLine[0].equalsIgnoreCase(nameLook)){
-//                System.out.println(line);
-//            }
-//    }
+
+    public static void deleteName(){
+        System.out.println("Enter the name to delete:");
+        String nameDelete = sc.nextLine();
+        List<String> tempList = new ArrayList<>();
+        int counter = 0;
+        try{
+            for(String line : Files.readAllLines(filepath)){
+                String[] eachLine = line.split("-");
+                if(eachLine[0].equalsIgnoreCase(nameDelete)){
+                    counter++;
+                }
+                //editList.add(line);
+            }
+
+            if(counter == 1){
+                for(String line : Files.readAllLines(filepath)){
+                    String[] eachLine = line.split("-");
+                    if(eachLine[0].equalsIgnoreCase(nameDelete)){
+                        continue;
+                    }
+                    tempList.add(line);
+                }
+            }else if(counter > 1){
+                System.out.println("There were multiple entries with the same name.");
+                System.out.println("Please enter a phone number to delete:");
+                String phoneDelete = sc.nextLine();
+                boolean isThere = checkPhone(phoneDelete);
+
+                if(isThere){
+                    for(String line : Files.readAllLines(filepath)){
+                        String[] eachLine = line.split("-");
+                        if(eachLine[1].equalsIgnoreCase(phoneDelete)){
+                            continue;
+                        }
+                        tempList.add(line);
+                    }
+                }else{
+                    System.out.println("Phone not in file.");
+                }
+
+            }
+            if(tempList.size() > 1){
+                Files.write(filepath, tempList);
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+
+    }
+
+    public static void editName(){
+        System.out.println("Enter the name to edit:");
+        String contactEdit = sc.nextLine();
+        List<String> editList = new ArrayList<>();
+
+        try{
+            for(String line : Files.readAllLines(filepath)){
+                String[] eachLine = line.split("-");
+                if(eachLine[0].equalsIgnoreCase(contactEdit)){
+                    continue;
+                }
+                editList.add(line);
+            }
+
+            Files.write(filepath, editList);
+            addName();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+    }
 
     public static void main(String[] args) {
 
@@ -133,22 +222,25 @@ public class contactApp {
             if (!Files.exists(dataFile)) {
                 Files.createFile(dataFile);
             }
+        } catch (IOException x) {
+            x.printStackTrace();
+        }
 
-            int response = 0;
+        int response = 0;
 
-           while(response != 6){
-               System.out.println();
-               System.out.println("1. View Contacts.");
-               System.out.println("2. Add a new contact.");
-               System.out.println("3. Search a contact by name.");
-               System.out.println("4. Edit a contact.");
-               System.out.println("5. Delete an existing contact.");
-               System.out.println("6. Exit");
-               System.out.println("Enter an option (1, 2, 3, 4 or 5)");
-               response = sc.nextInt();
-               sc.nextLine();
+        while(response != 6){
+            System.out.println();
+            System.out.println("1. View Contacts.");
+            System.out.println("2. Add a new contact.");
+            System.out.println("3. Search a contact by name.");
+            System.out.println("4. Edit a contact.");
+            System.out.println("5. Delete an existing contact.");
+            System.out.println("6. Exit");
+            System.out.println("Enter an option (1, 2, 3, 4, 5 or 6)");
+            response = sc.nextInt();
+            sc.nextLine();
 
-               switch (response){
+            switch (response){
                    case 1:
                        displayContacts();
                        break;
@@ -161,41 +253,15 @@ public class contactApp {
                        searchName(nameLook);
                        break;
                    case 4:
-                       System.out.println("Enter the name to edit:");
-                       String contactEdit = sc.nextLine();
-                       List<String> editList = new ArrayList<>();
-                       for(String line : Files.readAllLines(filepath)){
-                           String[] eachLine = line.split("-");
-                           if(eachLine[0].equalsIgnoreCase(contactEdit)){
-                               continue;
-                           }
-                           editList.add(line);
-                       }
-
-                       Files.write(filepath, editList);
-                       addName();
+                       editName();
                        break;
                    case 5:
-                       System.out.println("Enter the name to delete:");
-                       String nameDelete = sc.nextLine();
-                        List<String> tempList = new ArrayList<>();
-                        for(String line : Files.readAllLines(filepath)){
-                           String[] eachLine = line.split("-");
-                           if(eachLine[0].equalsIgnoreCase(nameDelete)){
-                               continue;
-                           }
-                           tempList.add(line);
-                       }
-
-                        Files.write(filepath, tempList);
-               }
-           }
-
-
-
-        } catch (IOException x) {
-            x.printStackTrace();
+                       deleteName();
+                       break;
+            }
         }
+
+
 
     }
 
