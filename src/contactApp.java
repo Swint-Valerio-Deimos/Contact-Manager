@@ -26,7 +26,7 @@ public class contactApp {
         String phone = sc.nextLine();
 
         try{
-            Integer.valueOf(phone);
+            Long.valueOf(phone);
 
         }catch (Exception e){
             System.out.println("Please enter a valid phone number...");
@@ -187,27 +187,75 @@ public class contactApp {
 
     }
 
-    public static void editName(){
+    public static void editName() {
         System.out.println("Enter the name to edit:");
         String contactEdit = sc.nextLine();
-        List<String> editList = new ArrayList<>();
-
-        try{
-            for(String line : Files.readAllLines(filepath)){
+        List<String> tempList = new ArrayList<>();
+        int editCounter = 0;
+        try {
+            for (String line : Files.readAllLines(filepath)) {
                 String[] eachLine = line.split("-");
-                if(eachLine[0].equalsIgnoreCase(contactEdit)){
-                    continue;
+                if (eachLine[0].equalsIgnoreCase(contactEdit)) {
+                    editCounter++;
                 }
-                editList.add(line);
+                //editList.add(line);
             }
 
-            Files.write(filepath, editList);
+            if (editCounter == 1) {
+                for (String line : Files.readAllLines(filepath)) {
+                    String[] eachLine = line.split("-");
+                    if (eachLine[0].equalsIgnoreCase(contactEdit)) {
+                        continue;
+                    }
+                    tempList.add(line);
+                }
+            } else if (editCounter > 1) {
+                System.out.println("There were multiple entries with the same name.");
+                System.out.println("Please enter a phone number to edit:");
+                String phoneDelete = sc.nextLine();
+                boolean isThere = checkPhone(phoneDelete);
+
+                if (isThere) {
+                    for (String line : Files.readAllLines(filepath)) {
+                        String[] eachLine = line.split("-");
+                        if (eachLine[1].equalsIgnoreCase(phoneDelete)) {
+                            continue;
+                        }
+                        tempList.add(line);
+                    }
+                } else {
+                    System.out.println("Phone not in file.");
+                }
+
+            }
+            if (tempList.size() > 1) {
+                Files.write(filepath, tempList);
+            }
             addName();
-        }catch (Exception e){
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
+
+
+
+//        try{
+//            for(String line : Files.readAllLines(filepath)){
+//                String[] eachLine = line.split("-");
+//                if(eachLine[0].equalsIgnoreCase(contactEdit)){
+//                    continue;
+//                }
+//                editList.add(line);
+//            }
+//
+//            Files.write(filepath, editList);
+//            addName();
+//        }catch (Exception e){
+//            e.printStackTrace();
+//        }
+//
+//    }
 
     public static void main(String[] args) {
 
@@ -266,3 +314,4 @@ public class contactApp {
     }
 
 }
+
