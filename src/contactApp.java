@@ -90,6 +90,7 @@ public class contactApp {
         return false;
     }
 
+
     public static void addName(){
         System.out.println("Please enter the name:");
         String name = sc.nextLine();
@@ -135,13 +136,14 @@ public class contactApp {
 
             int response = 0;
 
-           while(response != 5){
+           while(response != 6){
                System.out.println();
                System.out.println("1. View Contacts.");
                System.out.println("2. Add a new contact.");
                System.out.println("3. Search a contact by name.");
-               System.out.println("4. Delete an existing contact.");
-               System.out.println("5. Exit");
+               System.out.println("4. Edit a contact.");
+               System.out.println("5. Delete an existing contact.");
+               System.out.println("6. Exit");
                System.out.println("Enter an option (1, 2, 3, 4 or 5)");
                response = sc.nextInt();
                sc.nextLine();
@@ -159,6 +161,21 @@ public class contactApp {
                        searchName(nameLook);
                        break;
                    case 4:
+                       System.out.println("Enter the name to edit:");
+                       String contactEdit = sc.nextLine();
+                       List<String> editList = new ArrayList<>();
+                       for(String line : Files.readAllLines(filepath)){
+                           String[] eachLine = line.split("-");
+                           if(eachLine[0].equalsIgnoreCase(contactEdit)){
+                               continue;
+                           }
+                           editList.add(line);
+                       }
+
+                       Files.write(filepath, editList);
+                       addName();
+                       break;
+                   case 5:
                        System.out.println("Enter the name to delete:");
                        String nameDelete = sc.nextLine();
                         List<String> tempList = new ArrayList<>();
